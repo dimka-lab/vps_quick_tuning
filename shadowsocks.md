@@ -10,7 +10,7 @@ sudo nano /etc/shadowsocks-libev/config.json
 ```bash
 {
     "server":"0.0.0.0",
-    "server_port":8388,
+    "server_port":34782,
     "password":"STRONG_PASSWORD_HERE",
     "timeout":300,
     "method":"chacha20-ietf-poly1305",
@@ -21,8 +21,8 @@ sudo nano /etc/shadowsocks-libev/config.json
 ```
 
 ```bash
-sudo iptables -A INPUT -p tcp --dport 8388 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 8388 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 34782 -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 34782 -j ACCEPT
 sudo netfilter-persistent save
 ```
 
