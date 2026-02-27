@@ -32,12 +32,16 @@ sudo nano /etc/fail2ban/jail.local
 bantime = 12h
 findtime = 10m
 maxretry = 4
-bantime.increment = true
-bantime.factor = 2
+backend = systemd
 
 [sshd]
 enabled = true
 port = 6749
+filter = sshd
+```
+
+```bash
+sudo fail2ban-client -d
 ```
 
 ```bash
