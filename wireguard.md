@@ -55,7 +55,29 @@ sudo wg
 ping 10.66.66.1
 ```
 
+Отдельная таблица маршрутизации
+```bash
+echo "200 wgtable" | sudo tee -a /etc/iproute2/rt_tables
+```
+
+в этой таблице default через wg0
+```bash
+sudo ip route add default dev wg0 table wgtable
+```
+
+Маркируем исходящий трафик, где source port = 34782 Shadowsocks
+```bash
+sudo iptables -t mangle -A OUTPUT -p tcp --sport 34782 -j MARK --set-mark 1
+sudo iptables -t mangle -A OUTPUT -p udp --sport 34782 -j MARK --set-mark 1
+```
+
+правило маршрутизации по марке
+```bash
+sudo ip rule add fwmark 1 table wgtable
+```
 
 
+SSH → напрямую
+Трафик от Shadowsocks → через wg0 → WireGuard сервер
 
 
