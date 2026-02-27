@@ -83,6 +83,36 @@ sudo nano /etc/wireguard/wg0.conf
 
 `Table = off` в [Interface] после Address
 
+```bash
+ps aux | grep ss-server
+```
+
+Узнаём UID процесса
+```bash
+cat /proc/502/status | grep Uid
+```
+Uid:    64677   64677   64677   64677 
+
+Удяляем старые правила mark
+```bash
+sudo iptables -t mangle -F OUTPUT
+```
+
+Добавляем правильное правило по UID:
+```bash
+sudo iptables -t mangle -A OUTPUT -m owner --uid-owner 64677 -j MARK --set-mark 1
+```
+Проверяем
+```bash
+sudo iptables -t mangle -L -n -v
+```
+Пробуем подключиться к прокси Shadowsocks 
+```bash
+sudo watch -n1 wg
+```
+
+
+---
 
 SSH → напрямую
 Трафик от Shadowsocks → через wg0 → WireGuard сервер
