@@ -49,6 +49,60 @@ PermitRootLogin no
 PasswordAuthentication no
 ```
 
+Настроить iptables (минимально безопасный набор)
 
+Очистить старые правила:
+```bash
+sudo iptables -F
+sudo iptables -X
+```
 
+Политики по умолчанию:
+```bash
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
+```
+
+Разрешить локальный интерфейс:
+```bash
+sudo iptables -A INPUT -i lo -j ACCEPT
+```
+
+Разрешить уже установленные соединения:
+```bash
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+```
+
+Разрешить новый SSH-порт:
+```bash
+sudo iptables -A INPUT -p tcp --dport 2222 -m conntrack --ctstate NEW -j ACCEPT
+```
+
+если есть HTTP/HTTPS
+```bash
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+```
+
+Проверить
+```bash
+sudo iptables -nvL
+```
+
+Перезапустить ssh
+```bash
+sudo systemctl restart ssh
+```
+
+```bash
+ssh master@SERVER_IP -p 2222
+```
+
+Сохранить правила iptables (иначе пропадут после reboot)
+
+```bash
+sudo apt install iptables-persistent -y
+sudo netfilter-persistent save
+```
 
