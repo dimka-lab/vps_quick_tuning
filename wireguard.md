@@ -76,6 +76,13 @@ sudo iptables -t mangle -A OUTPUT -p udp --sport 34782 -j MARK --set-mark 1
 sudo ip rule add fwmark 1 table wgtable
 ```
 
+Потом добавить 
+```bash
+sudo nano /etc/wireguard/wg0.conf
+```
+
+`Table = off` в [Interface] после Address
+
 
 SSH → напрямую
 Трафик от Shadowsocks → через wg0 → WireGuard сервер
