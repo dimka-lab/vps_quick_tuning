@@ -29,10 +29,11 @@ sudo nano /etc/fail2ban/jail.local
 
 ```
 [DEFAULT]
-bantime = 1h
+bantime = 12h
 findtime = 10m
-maxretry = 5
-backend = systemd
+maxretry = 4
+bantime.increment = true
+bantime.factor = 2
 
 [sshd]
 enabled = true
