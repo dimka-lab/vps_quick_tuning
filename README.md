@@ -12,6 +12,12 @@ adduser master
 usermod -aG sudo master
 ```
 
+```bash
+sudo mkdir -p /home/master
+sudo chown master:master /home/master
+sudo chmod 700 /home/master
+```
+
 Защита от брутфорса (fail2ban)
 ```bash
 sudo apt install fail2ban -y
@@ -26,3 +32,10 @@ sudo systemctl start fail2ban
 ```bash
 sudo fail2ban-client status
 ```
+
+Проверить открытые порты
+```bash
+sudo ss -tulpn
+```
+
+
