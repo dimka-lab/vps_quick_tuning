@@ -38,4 +38,17 @@ sudo fail2ban-client status
 sudo ss -tulpn
 ```
 
+Сменить порт ssh
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+```config
+Port 2222
+PermitRootLogin no
+PasswordAuthentication no
+```
+
+
+
 
