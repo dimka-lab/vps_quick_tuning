@@ -24,13 +24,33 @@ sudo apt install fail2ban -y
 ```
 
 ```bash
-sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.local
+```
+
+```
+[DEFAULT]
+bantime = 1h
+findtime = 10m
+maxretry = 5
+backend = systemd
+
+[sshd]
+enabled = true
+port = 6749
+```
+
+```bash
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
+sudo systemctl status fail2ban
 ```
 
 ```bash
 sudo fail2ban-client status
+```
+
+```bash
+sudo fail2ban-client status sshd
 ```
 
 Проверить открытые порты
