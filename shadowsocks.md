@@ -31,3 +31,16 @@ sudo systemctl enable shadowsocks-libev
 sudo systemctl restart shadowsocks-libev
 sudo systemctl status shadowsocks-libev
 ```
+
+```bash
+sudo nano /etc/resolv.conf
+```
+
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+nameserver 94.140.14.14
+
+
+```bash
+systemctl status systemd-resolved
+```
