@@ -106,10 +106,28 @@ sudo iptables -t mangle -A OUTPUT -m owner --uid-owner 64677 -j MARK --set-mark 
 ```bash
 sudo iptables -t mangle -L -n -v
 ```
+
+Удяляем текущий маршрут
+```bash
+sudo ip route flush table wgtable
+```
+
+```bash
+sudo ip route add default dev wg0 scope link table wgtable
+```
+
+```bash
+ip route show table wgtable
+```
+
+8.8.8.8 dev wg0 table wgtable
+
+
 Пробуем подключиться к прокси Shadowsocks 
 ```bash
 sudo watch -n1 wg
 ```
+
 
 
 ---
