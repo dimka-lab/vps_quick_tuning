@@ -25,6 +25,19 @@ sudo nano /etc/wireguard/wg0.conf
 ```
 и вставить содержимое wg0-client-node_a.conf
 
+```
+[Interface]
+PrivateKey = <key>
+Address = 10.66.66.9/32, fd42:42:42::9/128
+
+[Peer]
+PublicKey = <public key>
+PresharedKey = <pre shared key>
+Endpoint = <ip_сервера>:55289
+AllowedIPs = 10.66.66.0/24, fd42:42:42::/64
+PersistentKeepalive = 25
+```
+
 ```bash
 sudo chmod 600 /etc/wireguard/wg0.conf
 ```
