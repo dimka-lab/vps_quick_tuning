@@ -122,6 +122,12 @@ ip route show table wgtable
 
 8.8.8.8 dev wg0 table wgtable
 
+DNS трафик Shadowsocks тоже идти через WireGuard
+```bash
+sudo iptables -t mangle -A OUTPUT -p udp --dport 53 -m owner --uid-owner 64677 -j MARK --set-mark 1
+```
+
+На клиенте Shadowsocks 
 
 Пробуем подключиться к прокси Shadowsocks 
 ```bash
