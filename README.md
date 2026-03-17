@@ -1,29 +1,27 @@
 # vps_quick_tuning
 Quick primitive setting VPS Ubuntu
 
-Update pacakges
-### 
 ```bash
+# Update packages
 sudo apt update
-```
-Создадим пользователя с sudo-привилегиями
-```bash
+
+# Base tools
+sudo apt install -y nano htop curl wget net-tools ethtool
+
+# Fix Hyper-V / network offloading issues
+# sudo ethtool -K eth0 tx off rx off tso off gso off gro off
+
+# Create user with sudo
 adduser master
 usermod -aG sudo master
-```
 
-```bash
 sudo mkdir -p /home/master
 sudo chown master:master /home/master
 sudo chmod 700 /home/master
-```
 
-Защита от брутфорса (fail2ban)
-```bash
+# Fail2ban
 sudo apt install fail2ban -y
-```
 
-```bash
 sudo nano /etc/fail2ban/jail.local
 ```
 
@@ -31,7 +29,7 @@ sudo nano /etc/fail2ban/jail.local
 [DEFAULT]
 bantime = 12h
 findtime = 10m
-maxretry = 4
+maxretry = 5
 backend = systemd
 
 [sshd]
@@ -41,93 +39,87 @@ filter = sshd
 ```
 
 ```bash
-sudo fail2ban-client -d
-```
-
-```bash
 sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
-sudo systemctl status fail2ban
-```
-
-```bash
-sudo fail2ban-client status
-```
-
-```bash
+sudo systemctl restart fail2ban
 sudo fail2ban-client status sshd
-```
 
-Проверить открытые порты
-```bash
+# Проверить открытые порты
 sudo ss -tulpn
-```
 
-Сменить порт ssh
-```bash
-sudo nano /etc/ssh/sshd_config
-```
+# Firewall (безопасный порядок)
 
-```config
-Port 2222
-PermitRootLogin no
-PasswordAuthentication no
-```
-
-Настроить iptables (минимально безопасный набор)
-
-Очистить старые правила:
-```bash
+# Очистить
 sudo iptables -F
 sudo iptables -X
-```
 
-Политики по умолчанию:
-```bash
+# Разрешить базовое
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Разрешить SSH (старый порт)
+sudo iptables -A INPUT -p tcp --dport 6749 -j ACCEPT
+
+# (опционально) HTTP/HTTPS
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Установить политики (после разрешений)
 sudo iptables -P INPUT DROP
 sudo iptables -P FORWARD DROP
 sudo iptables -P OUTPUT ACCEPT
-```
 
-Разрешить локальный интерфейс:
-```bash
-sudo iptables -A INPUT -i lo -j ACCEPT
-```
-
-Разрешить уже установленные соединения:
-```bash
-sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-```
-
-Разрешить новый SSH-порт:
-```bash
-sudo iptables -A INPUT -p tcp --dport 2222 -m conntrack --ctstate NEW -j ACCEPT
-```
-
-если есть HTTP/HTTPS
-```bash
-sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-```
-
-Проверить
-```bash
+# Проверить
 sudo iptables -nvL
+
+# Настроить SSH
+sudo nano /etc/ssh/sshd_config
 ```
 
-Перезапустить ssh
+```
+Port 6749
+PermitRootLogin no
+PasswordAuthentication yes
+```
+
 ```bash
+# Перезапустить SSH
 sudo systemctl restart ssh
-```
 
-```bash
-ssh master@SERVER_IP -p 2222
-```
+# Проверить вход (НОВОЕ подключение!)
+ssh master@SERVER_IP -p 6749
 
-Сохранить правила iptables (иначе пропадут после reboot)
+# Если работает — можно удалить старый порт
+sudo iptables -D INPUT -p tcp --dport 22 -j ACCEPT
 
-```bash
+# Сохранить iptables
 sudo apt install iptables-persistent -y
 sudo netfilter-persistent save
+
+# Shadowsocks (если нужен)
+sudo apt install shadowsocks-libev -y
+
+sudo nano /etc/shadowsocks-libev/config.json
 ```
 
+```json
+{
+    "server": "0.0.0.0",
+    "server_port": 34782,
+    "password": "STRONG_PASSWORD_HERE",
+    "timeout": 300,
+    "method": "chacha20-ietf-poly1305",
+    "mode": "tcp_and_udp"
+}
+```
+
+```bash
+# Открыть порт shadowsocks
+sudo iptables -A INPUT -p tcp --dport 34782 -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 34782 -j ACCEPT
+
+sudo systemctl enable shadowsocks-libev
+sudo systemctl restart shadowsocks-libev
+
+# Пересохранить правила
+sudo netfilter-persistent save
+```
